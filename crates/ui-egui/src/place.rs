@@ -121,6 +121,10 @@ pub fn run(app: &mut VectorcraftApp, p: &Value) -> Result<Value, String> {
     if crate::dialogs::dxf_import::offer_place(app, p) {
         return Ok(json!({ "dialog": crate::dialogs::dxf_import::KIND }));
     }
+    // Um documento CorelDRAW pergunta as preferências de importação.
+    if crate::dialogs::cdr_import::offer_place(app, p) {
+        return Ok(json!({ "dialog": crate::dialogs::cdr_import::KIND }));
+    }
     let mut p = p.clone();
     if ["at", "rect", "replace"].iter().all(|k| p.get(k).is_none())
         && let Some(v) = app.view()

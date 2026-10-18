@@ -741,6 +741,19 @@ pub const UI_COMMANDS: &[(&str, &str, &str, &str)] = &[
     ("file.openRecent29", "Open Recent File 29", "", "{}"),
     ("file.openRecent30", "Open Recent File 30", "", "{}"),
     ("file.reveal", "Show in Folder", "", "{} show the document's file in the system file manager (desktop) → {path}"),
+    ("file.openCdr", "Open CDR…", "", "{} pick a CorelDRAW (.cdr) document and open it through CorelDRAW Import Options (dialog `cdrImport`)"),
+    (
+        "file.importCdr",
+        "Import CDR…",
+        "",
+        "{} pick a CorelDRAW (.cdr) document and import it into the active document through CorelDRAW Import Options (dialog `cdrImport`, mode place)",
+    ),
+    (
+        "file.exportCdr",
+        "Export CDR…",
+        "",
+        "{path?, version?, textToOutlines?, validate?, rasterizeEffects?} ask where to write a CorelDRAW file, then CorelDRAW Export Options (dialog `cdrOptions`); OK writes and validates it",
+    ),
     (
         "ui.dxfOptionsDialog",
         "DXF Options Dialog",
@@ -1111,6 +1124,9 @@ pub fn run_ui_command(app: &mut VectorcraftApp, id: &str, p: &Value) -> Option<R
         }
         "file.recentFiles" => Ok(json!(io::recent_files(app))),
         "file.place" => crate::place::run(app, p),
+        "file.openCdr" => crate::dialogs::cdr_import::pick_open(app),
+        "file.importCdr" => crate::dialogs::cdr_import::pick_import(app),
+        "file.exportCdr" => crate::dialogs::cdr_options::export_command(app, p),
         "file.place.queue" => crate::place::queue(app, p),
         "file.export.svg" if p.as_object().is_none_or(|o| o.is_empty()) => {
             crate::dialogs::svg_options::open(app, crate::dialogs::svg_options::Mode::Export, None);
@@ -2260,6 +2276,7 @@ pub fn enabled(app: &VectorcraftApp, id: &str) -> bool {
         "ui.spotColors" => app.session.active().is_some(),
         "ui.menuDialog" => app.session.active().is_some_and(|d| !d.selection.is_empty()),
         "ui.dxfOptionsDialog" => app.session.active().is_some(),
+        "file.importCdr" | "file.exportCdr" => app.session.active().is_some(),
         "links.editOriginal" | "links.reveal" => selected_image(app, |im| im.link.is_some()) || selected_placed(app),
         "ui.placementOptionsDialog" => selected_image(app, |_| true) || selected_placed(app),
         "ui.findLinksInFolder" => crate::picks::can(app, &crate::picks::PickRequest::Folder) && app.session.active().is_some(),
@@ -2320,6 +2337,7 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
                 c("New…", "file.newDialog"),
                 c("New from Template…", "file.newFromTemplate"),
                 c("Open…", "file.open"),
+                c("Open CDR…", "file.openCdr"),
                 sub("Open Recent Files", {
                     let mut v: Vec<Item> = RECENT_IDS.iter().map(|id| c("Recent File", id)).collect();
                     v.push(Sep);
@@ -2339,6 +2357,7 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
                 c("Revert", "file.revert"),
                 Sep,
                 c("Place…", "file.place"),
+                c("Import CDR…", "file.importCdr"),
                 Sep,
                 sub(
                     "Export",
@@ -2351,6 +2370,7 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
                     ],
                 ),
                 c("Export Selection…", "file.exportSelection"),
+                c("Export CDR…", "file.exportCdr"),
                 Sep,
                 c("Package…", "ui.packageDialog"),
                 sub("Scripts", vec![c("Check Script…", "ui.checkScript"), todos("Other Script…", "Cmd+F12")]),

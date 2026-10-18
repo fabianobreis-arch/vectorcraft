@@ -9,7 +9,7 @@ use std::sync::LazyLock;
 use serde_json::{Value, json};
 use vectorcraft_engine::cmd::fileio::{self, ArtboardPick, Format};
 
-use super::{DialogSpec, dxf_options, eps_options, form, png_options, save_pdf, svg_options, text_export};
+use super::{DialogSpec, cdr_options, dxf_options, eps_options, form, png_options, save_pdf, svg_options, text_export};
 use crate::state::Dialog;
 use crate::theme::Tokens;
 use crate::{VectorcraftApp, io, widgets};
@@ -148,6 +148,10 @@ fn confirm(app: &mut VectorcraftApp, d: &Dialog) -> Result<Value, String> {
             }
             if f.id == "dxf" {
                 dxf_options::open(app, &params);
+                return Ok(Value::Null);
+            }
+            if f.id == "cdr" {
+                cdr_options::open(app, &params);
                 return Ok(Value::Null);
             }
             if f.id == "eps" {

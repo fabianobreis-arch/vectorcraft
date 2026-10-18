@@ -4753,3 +4753,46 @@ lighting	Light	광원
 @msg	too many library panels were opened in this session	이 세션에서 라이브러리 패널을 너무 많이 열었습니다
 @msg	The image is {_1} × {_2} pixels, more than {LARGE_TRACE_SIDE} on a side: it is traced, but more slowly. A lower-fidelity preset or a smaller copy of the image traces faster.	이미지가 {_1} × {_2}픽셀로 한 변이 {LARGE_TRACE_SIDE}을 넘습니다. 추적은 되지만 더 느립니다. 충실도가 낮은 사전 설정이나 이미지의 작은 사본을 사용하면 더 빠릅니다.
 @msg	The image was traced at {_1} × {_2} pixels, scaled down from {_3} × {_4} ({_5} megapixels at most).	이미지를 {_3} × {_4}에서 축소한 {_1} × {_2}픽셀로 추적했습니다(최대 {_5}메가픽셀).
+
+# CorelDRAW (.cdr): Abrir/Importar/Exportar CDR. Pendente de tradução: mantido em inglês.
+	Open CDR…	Open CDR…
+	Import CDR…	Import CDR…
+	Export CDR…	Export CDR…
+	Import CorelDRAW	Import CorelDRAW
+	CorelDRAW Import Options	CorelDRAW Import Options
+	CorelDRAW document read	CorelDRAW document read
+	format version	format version
+	page(s)	page(s)
+	object(s)	object(s)
+	This file can't be read:	This file can't be read:
+	Scale and Structure	Scale and Structure
+	Preserve Original Document Scale	Preserve Original Document Scale
+	The first page is scaled to fit the first artboard.	The first page is scaled to fit the first artboard.
+	Preserve Layers and Groups	Preserve Layers and Groups
+	Keep Text Editable When Possible	Keep Text Editable When Possible
+	Convert Text to Outlines	Convert Text to Outlines
+	Warn About Missing Fonts	Warn About Missing Fonts
+	Compatibility	Compatibility
+	Report Unsupported Effects	Report Unsupported Effects
+	Editable vectors are never turned into images. What can't be kept is listed in the import notes.	Editable vectors are never turned into images. What can't be kept is listed in the import notes.
+	CorelDRAW Export Options	CorelDRAW Export Options
+	verified	verified
+	experimental	experimental
+	Target Version:	Target Version:
+	Files of this version were verified to open in CorelDRAW. Older CorelDRAW releases can't open newer versions: pick the oldest one you need.	Files of this version were verified to open in CorelDRAW. Older CorelDRAW releases can't open newer versions: pick the oldest one you need.
+	Experimental: written with the layout of that version's sample files, but not verified to open in CorelDRAW.	Experimental: written with the layout of that version's sample files, but not verified to open in CorelDRAW.
+	Keep Text Editable	Keep Text Editable
+	Area type, vertical type and type on a path are always written as outlines.	Area type, vertical type and type on a path are always written as outlines.
+	Preserve Vector Paths	Preserve Vector Paths
+	Rasterize Raster Effects (Shadows, Glows, Blurs)	Rasterize Raster Effects (Shadows, Glows, Blurs)
+	Validate After Export	Validate After Export
+	Without validation the written file isn't checked.	Without validation the written file isn't checked.
+	Exporting to CorelDRAW…	Exporting to CorelDRAW…
+	Open CDR	Open CDR
+	Import CDR	Import CDR
+	Export CDR	Export CDR
+	CorelDRAW file exported and validated	CorelDRAW file exported and validated
+	CorelDRAW file exported (not validated)	CorelDRAW file exported (not validated)
+	CorelDRAW Compatibility	CorelDRAW Compatibility
+	CorelDRAW File Info	CorelDRAW File Info
+@msg	CDR version {_1}: choose from {_2} to {_3}	CDR version {_1}: choose from {_2} to {_3}
