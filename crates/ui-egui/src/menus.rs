@@ -750,7 +750,7 @@ pub const UI_COMMANDS: &[(&str, &str, &str, &str)] = &[
     ),
     (
         "file.exportCdr",
-        "Export CDR…",
+        "Export As CDR…",
         "",
         "{path?, version?, textToOutlines?, validate?, rasterizeEffects?} ask where to write a CorelDRAW file, then CorelDRAW Export Options (dialog `cdrOptions`); OK writes and validates it",
     ),
@@ -2337,7 +2337,6 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
                 c("New…", "file.newDialog"),
                 c("New from Template…", "file.newFromTemplate"),
                 c("Open…", "file.open"),
-                c("Open CDR…", "file.openCdr"),
                 sub("Open Recent Files", {
                     let mut v: Vec<Item> = RECENT_IDS.iter().map(|id| c("Recent File", id)).collect();
                     v.push(Sep);
@@ -2357,7 +2356,6 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
                 c("Revert", "file.revert"),
                 Sep,
                 c("Place…", "file.place"),
-                c("Import CDR…", "file.importCdr"),
                 Sep,
                 sub(
                     "Export",
@@ -2366,11 +2364,11 @@ pub fn menu_tree_named(english_names: bool) -> Vec<(&'static str, Vec<Item>)> {
                         c("Export As…", "file.exportAs"),
                         c("Export As SVG…", "file.export.svg"),
                         c("Export As PNG…", "file.export.png"),
+                        c("Export As CDR…", "file.exportCdr"),
                         c("Save for Web (Legacy)…", "file.saveForWeb"),
                     ],
                 ),
                 c("Export Selection…", "file.exportSelection"),
-                c("Export CDR…", "file.exportCdr"),
                 Sep,
                 c("Package…", "ui.packageDialog"),
                 sub("Scripts", vec![c("Check Script…", "ui.checkScript"), todos("Other Script…", "Cmd+F12")]),

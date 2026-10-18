@@ -5,12 +5,11 @@ Status: implementado localmente (branch `feat/cdr-suporte`). Gerado em parte de
 
 ## Onde está na interface
 
-- **Arquivo › Abrir CDR…** — abre um `.cdr` (o **Arquivo › Abrir…** comum também reconhece o
-  formato pelo conteúdo). Mostra as *Opções de Importação do CorelDRAW*.
-- **Arquivo › Importar CDR…** — importa um `.cdr` no documento aberto, como grupo posicionado
-  (mesmo fluxo do Inserir).
-- **Arquivo › Exportar CDR…** e **Arquivo › Exportar › Exportar Como… › CorelDRAW** — mostram as
-  *Opções de Exportação do CorelDRAW*.
+- **Arquivo › Abrir…** — o filtro inclui `*.cdr` (o formato também é reconhecido pelo conteúdo).
+  Mostra as *Opções de Importação do CorelDRAW*.
+- **Arquivo › Colocar…** — importa um `.cdr` no documento aberto, pelo mesmo diálogo.
+- **Arquivo › Exportar › Exportar Como CDR…** e **Arquivo › Exportar › Exportar Como… › CorelDRAW**
+  — mostram as *Opções de Exportação do CorelDRAW*.
 
 Preferências de importação: preservar a escala original; preservar camadas e grupos; manter texto
 editável ou converter em contornos; avisar sobre fontes ausentes; relatar efeitos não suportados.
