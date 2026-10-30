@@ -13,7 +13,7 @@ use serde_json::{Value, json};
 use vectorcraft_cdr::{ExportOptions, ImportOptions};
 use vectorcraft_doc::Document;
 
-use super::super::*;
+use super::super::{CommandSpec, Result, Session, always, bad, cmd};
 use super::{Encoded, FormatOption, err, source};
 
 const C: &str = "document.export";

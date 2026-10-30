@@ -66,7 +66,7 @@ pub const ROTATE_VIEW_ANGLES: [(&str, f64); 12] = [
     ("-90°", -90.0),
 ];
 
-use super::*;
+use super::{ControlResponse, Sender};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Zoom stop stepping reads this (set each UI frame and before commands) so canvas wheel zoom
@@ -483,6 +483,11 @@ pub struct UiState {
     /// swatches) or "" (none) (`ui.colorGuideLimit`).
     #[serde(default)]
     pub color_guide_limit: String,
+    /// Color Guide panel: the base color, set by a color chosen in the Color panel, the Swatches
+    /// panel or the Color Picker and by the panel's base chip (none: the current color). Not
+    /// saved.
+    #[serde(skip)]
+    pub color_guide_base: Option<vectorcraft_color::Color>,
     /// Align panel: the Align To choice, Selection or Artboard, which Object → Align and the align
     /// buttons follow ([`crate::panels::align::with_align_to`]).
     #[serde(default, deserialize_with = "crate::panels::align::deserialize_align_to")]
@@ -536,6 +541,9 @@ pub struct UiState {
     /// dialog opens on them (#1152).
     #[serde(default)]
     pub offset_path: Value,
+    /// The Average & Join fields confirmed last (`to`; null: never used): its dialog opens on them.
+    #[serde(default)]
+    pub average_join: Value,
     /// The Simplify dialog's fields confirmed last with "Open this dialog with these settings next
     /// time" ticked (null: not ticked): Object › Path › Simplify opens the dialog on them instead
     /// of the Simplify slider.
@@ -550,6 +558,9 @@ pub struct UiState {
     /// them (#1732).
     #[serde(default)]
     pub transform_each: Value,
+    /// The spacing used the last time Rearrange All Artboards was confirmed.
+    #[serde(default)]
+    pub rearrange_artboards_spacing: Value,
     /// The DXF Import Options chosen last (fit, scaleLineweights, center, mergeLayers; null:
     /// never used).
     #[serde(default)]
@@ -861,6 +872,7 @@ impl Default for UiState {
             library_panels: vec![],
             flattener_preview: Default::default(),
             color_guide_limit: String::new(),
+            color_guide_base: None,
             align_to: Default::default(),
             align_spacing: 0.0,
             color_mode: None,
@@ -875,9 +887,11 @@ impl Default for UiState {
             dxf_options: Value::Null,
             eps_options: Value::Null,
             offset_path: Value::Null,
+            average_join: Value::Null,
             simplify: Value::Null,
             move_options: Value::Null,
             transform_each: Value::Null,
+            rearrange_artboards_spacing: Value::Null,
             dxf_import: Value::Null,
             cdr_options: Value::Null,
             cdr_import: Value::Null,

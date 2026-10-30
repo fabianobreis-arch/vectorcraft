@@ -953,6 +953,66 @@ fn sections_it_skips() {
     assert_eq!(art(&doc).len(), 1);
 }
 
+/// A filled square at x = `10 × i` (5 pt wide), to tell the alternatives of versioned content apart.
+fn alt_square(i: u32) -> String {
+    let x = f64::from(i) * 10.0;
+    rect_path(x, 0.0, x + 5.0, 5.0) + "f\n"
+}
+
+/// The left edges of the layer's art, in order: which [`alt_square`]s came in.
+fn squares(doc: &Document) -> Vec<f64> {
+    art(doc).iter().filter_map(|n| n.geometric_bounds()).map(|b| b.x0.round()).collect()
+}
+
+/// Versioned content holds alternatives of the same art for newer and older versions (newer
+/// files write a Dimension tool group, then the same group again for a version in between, then
+/// plain art): only the first alternative is read, so the art comes in once, however many
+/// alternatives follow and whatever versioned content is nested in them.
+#[test]
+fn versioned_content_reads_one_alternative() {
+    let (begin, between, alternate, end) = (
+        "%AI17_Begin_Content_if_version_gt:24 11\n",
+        "%AI17_Alternate_Content_if_version_gt:24 10\n",
+        "%AI17_Alternate_Content\n",
+        "%AI17_End_Versioned_Content\n",
+    );
+    let (a, b, c) = (alt_square(1), alt_square(2), alt_square(3));
+    let cases = [
+        ("one alternative", format!("{begin}{a}{end}"), vec![10.0]),
+        ("two alternatives", format!("{begin}{a}{alternate}{b}{end}"), vec![10.0]),
+        ("three alternatives", format!("{begin}{a}{between}{b}{alternate}{c}{end}"), vec![10.0]),
+        // Blocks nested in the first alternative read their own first; those in a later one aren't read.
+        (
+            "nested",
+            format!(
+                "{begin}{a}{begin}{b}{alternate}{c}{end}{between}{}{begin}{}{alternate}{}{end}{alternate}{}{end}",
+                alt_square(4),
+                alt_square(5),
+                alt_square(6),
+                alt_square(7)
+            ),
+            vec![10.0, 20.0],
+        ),
+        // Art after the block is read as usual.
+        ("art after it", format!("{begin}{a}{between}{b}{alternate}{c}{end}{}", alt_square(8)), vec![10.0, 80.0]),
+    ];
+    for (case, body, want) in cases {
+        let s = read_ok(&layer(&body));
+        assert_eq!(squares(&s.doc), want, "{case}");
+        assert!(!s.warnings.iter().any(|w| w == read::VERSIONED_UNENDED), "{case}: {:?}", s.warnings);
+    }
+}
+
+/// Versioned content whose end is missing is read whole, with a note, rather than losing the rest
+/// of the file.
+#[test]
+fn versioned_content_that_does_not_end_is_read_with_a_note() {
+    let body = format!("%AI17_Begin_Content_if_version_gt:24 11\n{}%AI17_Alternate_Content_if_version_gt:24 10\n{}", alt_square(1), alt_square(2));
+    let s = read_ok(&layer(&body));
+    assert_eq!(squares(&s.doc), [10.0, 20.0]);
+    assert!(s.warnings.iter().any(|w| w == read::VERSIONED_UNENDED), "{:?}", s.warnings);
+}
+
 /// Non-native art (a placed PDF's content) keeps its PDF as ASCII85 in comment lines after
 /// `/Data ,`. ASCII85 has `_`, so a line may start with `%_`, which otherwise reads as hidden
 /// tokens, and a `(` in it would swallow the rest of the layer (a letterhead saved by Illustrator
@@ -1206,7 +1266,51 @@ fn editing_data_past_256_mib_is_read() {
     assert!(raw.len() < 1 << 20, "zeros compress");
     let data = decode_private(&raw).unwrap();
     assert_eq!(data.len(), body.len());
-    assert!(too_large().contains("512 MB"));
+    assert_eq!(too_large(), format!("it decompresses to more than {} MB", max_data() >> 20));
+}
+
+/// The limit is an eighth of installed memory, never under the 512 MiB every 64-bit build read
+/// before and never over 2 GiB (#3510).
+#[cfg(target_pointer_width = "64")]
+#[test]
+fn the_editing_data_limit_follows_installed_memory() {
+    const GIB: u64 = 1 << 30;
+    assert_eq!(data_limit(None), 512 << 20, "unknown memory keeps the old limit");
+    assert_eq!(data_limit(Some(2 * GIB)), 512 << 20);
+    assert_eq!(data_limit(Some(4 * GIB)), 512 << 20);
+    assert_eq!(data_limit(Some(8 * GIB)), GIB);
+    assert_eq!(data_limit(Some(12 * GIB)), 3 * GIB / 2);
+    assert_eq!(data_limit(Some(16 * GIB)), 2 * GIB);
+    assert_eq!(data_limit(Some(256 * GIB)), 2 * GIB, "capped, so a tiny file can't take all of a big machine");
+    assert!((MIN_DATA..=MAX_DATA).contains(&max_data()));
+}
+
+/// On a machine with 8 GiB or more, editing data past the old 512 MiB limit opens with its layers
+/// (#3510, #4628): a layered file whose rasters unpack to 600 MiB.
+#[cfg(target_pointer_width = "64")]
+#[test]
+fn editing_data_past_512_mib_is_read_where_memory_allows() {
+    if max_data() < 601 << 20 {
+        return;
+    }
+    let mut body = stream(&format!("{}{}", layer(&rect_path(0.0, 0.0, 10.0, 10.0)), layer(&rect_path(20.0, 20.0, 30.0, 30.0)))).into_bytes();
+    let filler = vec![b'%'; (600 << 20) - body.len()];
+    let at = body.windows(14).position(|w| w == b"%%PageTrailer\n").unwrap();
+    body.splice(at..at, filler);
+    let raw = [&b"%AI12_CompressedData"[..], &crate::ps::deflate(&body)].concat();
+    let data = decode_private(&raw).unwrap();
+    assert_eq!(data.len(), body.len());
+    drop(body);
+    let r = read(&data).unwrap();
+    assert_eq!(r.doc.layers.len(), 2, "both layers are read");
+}
+
+/// Past the limit the data is still refused, so the file opens as its PDF part with a note.
+#[test]
+fn editing_data_past_the_limit_is_refused() {
+    let raw = [&b"%AI12_CompressedData"[..], &crate::ps::deflate(b"%%")].concat();
+    assert!(Codec::Zlib.decode(raw.get(20..).unwrap(), 1).is_err());
+    assert!(Codec::Zlib.decode(raw.get(20..).unwrap(), 2).is_ok());
 }
 
 #[test]
