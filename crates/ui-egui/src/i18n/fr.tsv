@@ -2638,6 +2638,7 @@ font-technology	Variable	Variables
 	Repeat Tab	Répéter la tabulation
 	Repeat {name}	Répéter {name}
 	Replace	Remplacer
+	Replace:	Remplacer :
 	Replace Font	Remplacer la police
 	Replace it with another file, or ignore it: its images keep showing the preview saved with the document.	Remplacez-le par un autre fichier ou ignorez-le : ses images continueront d’afficher l’aperçu enregistré avec le document.
 	Replace Spine	Remplacer la dorsale

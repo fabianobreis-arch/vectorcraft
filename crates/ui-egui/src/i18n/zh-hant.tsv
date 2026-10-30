@@ -3478,6 +3478,7 @@ font-script	Japanese	漢字
 	Repeat Tab	重複定位點
 	Repeat {name}	重複 {name}
 	Replace	取代
+	Replace:	取代：
 	Replace Font	取代字體
 	Replace it with another file, or ignore it: its images keep showing the preview saved with the document.	以其他檔案取代，或忽略：其影像會繼續顯示隨文件儲存的預覽。
 	Replace Spine	取代脊線

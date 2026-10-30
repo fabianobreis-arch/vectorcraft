@@ -2639,6 +2639,7 @@ mark-style	Japanese	일본식
 	Repeat Tab	탭 반복
 	Repeat {name}	{name} 반복
 	Replace	바꾸기
+	Replace:	바꾸기:
 	Replace Font	글꼴 바꾸기
 	Replace Symbol	심볼 바꾸기
 	Replace With Font	바꿀 글꼴

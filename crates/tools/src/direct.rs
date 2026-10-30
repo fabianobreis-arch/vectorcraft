@@ -530,6 +530,28 @@ fn anchors_json(v: &[AnchorRef]) -> Value {
     Value::Array(v.iter().map(|(s, a)| json!([s, a])).collect())
 }
 
+/// The segments of `path` that marquee `r` crosses with neither of their anchors inside it, as
+/// (subpath, segment) pairs: the reference app selects a segment that a marquee is dragged "over
+/// part of" (<http://web.archive.org/web/20211230015528/https://helpx.adobe.com/illustrator/using/selecting-objects.html>).
+fn crossed_segments(path: &PathData, r: Rect) -> Vec<AnchorRef> {
+    let mut out = vec![];
+    for (si, sp) in path.subpaths.iter().enumerate() {
+        let n = sp.anchors.len();
+        let count = if sp.closed { n } else { n.saturating_sub(1) };
+        for seg in 0..count {
+            let (Some(a), Some(b)) = (sp.anchors.get(seg), sp.anchors.get((seg + 1) % n)) else { continue };
+            if r.contains(a.p) || r.contains(b.p) {
+                continue;
+            }
+            let piece = PathData::single(vectorcraft_geom::SubPath::new(vec![*a, *b], false));
+            if vectorcraft_geom::hit::intersects_rect(&piece, r) {
+                out.push((si, seg));
+            }
+        }
+    }
+    out
+}
+
 /// A segment of a path under the pointer.
 struct SegmentHit {
     si: usize,
@@ -1412,10 +1434,29 @@ impl DirectSelectionTool {
             }
         }
         sel.retain(|(id, _)| editable(*id));
+        // Direct Selection: a segment the marquee crosses with neither of its anchors inside it is
+        // selected, as a click on it selects it (#4654).
+        let mut crossed: Vec<(NodeId, Vec<AnchorRef>)> = vec![];
+        if !self.group {
+            walk_pickable(cx.doc, cx.isolation, |n| {
+                if let NodeKind::Path { path, .. } = &n.kind
+                    && editable(n.id)
+                {
+                    let segs = crossed_segments(path, r);
+                    if !segs.is_empty() {
+                        crossed.push((n.id, segs));
+                    }
+                }
+            });
+        }
         self.frame = marked;
         let items: Vec<Value> = sel.iter().map(|(id, v)| json!({"id": id.0, "anchors": anchors_json(v)})).collect();
         let art = Action::Exec("select.anchorsMany".into(), json!({"items": items, "mode": if toggle { "toggle" } else { "set" }}));
-        let mut out: Vec<Action> = std::iter::once(art).chain(crate::rulerguide::marquee_select(cx, r, false)).collect();
+        let mode = if toggle { "toggle" } else { "add" };
+        let segments = crossed
+            .iter()
+            .map(|(id, segs)| Action::Exec("select.segments".into(), json!({"id": id.0, "segments": anchors_json(segs), "mode": mode})));
+        let mut out: Vec<Action> = std::iter::once(art).chain(segments).chain(crate::rulerguide::marquee_select(cx, r, false)).collect();
         if !self.frame.is_empty() {
             out.push(Action::Notify(FRAME_PICKED.into()));
         }

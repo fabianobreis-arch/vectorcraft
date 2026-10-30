@@ -3363,6 +3363,7 @@ axis	Both	ორივე
 	Set Text	ტექსტის დაყენება
 	Insert Character	სიმბოლოს ჩასმა
 	Replace	ჩანაცვლება
+	Replace:	ჩანაცვლება:
 	Type on a Path Options	ტრაექტორიაზე ტექსტის პარამეტრები
 	Highlight Variable	ცვლადის გამოკვეთა
 	New Variable	ახალი ცვლადი

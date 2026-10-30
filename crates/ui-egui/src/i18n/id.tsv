@@ -3578,6 +3578,7 @@ axis	Both	Keduanya
 	Set Text	Atur teks
 	Insert Character	Sisipkan karakter
 	Replace	Ganti
+	Replace:	Ganti:
 	Type on a Path Options	Opsi teks pada jalur
 	Highlight Variable	Sorot variabel
 	New Variable	Variabel baru

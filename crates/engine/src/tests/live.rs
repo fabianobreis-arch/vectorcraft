@@ -1094,7 +1094,7 @@ fn svg_export_expands_live_objects() {
     let s = live_doc();
     let svg = vectorcraft_svg::export(&s.doc().unwrap().doc, &Default::default());
     // 4 blend objects + envelope content + 4 patches × 64 mesh pieces.
-    let paths = svg.matches("<path").count();
+    let paths = vectorcraft_testkit::svg_shapes(&svg);
     assert!(paths >= 4 + 1 + 256, "{paths}");
     assert!(vectorcraft_svg::import(&svg).is_ok());
 }
@@ -1224,7 +1224,9 @@ fn cmyk_mesh(create: Value) -> (Session, NodeId) {
     (s, a)
 }
 
-/// The fill colours `document.exportPdf {standard: pdfX4}` writes (`… scn` operands), and its warnings.
+/// The fill colours `document.exportPdf {standard: pdfX4}` writes (`… scn` operands, and the
+/// corner colours of its gradient meshes, which are patch shadings, as PDF import reads them
+/// back), and its warnings.
 fn pdf_fill_colours(s: &mut Session) -> (Vec<Vec<f32>>, Vec<String>) {
     let v = s.execute("document.exportPdf", &json!({"standard": "pdfX4", "compression": {"compressText": false}})).unwrap();
     let bytes = vectorcraft_format::base64_decode(v["dataBase64"].as_str().unwrap()).unwrap();
@@ -1235,10 +1237,21 @@ fn pdf_fill_colours(s: &mut Session) -> (Vec<Vec<f32>>, Vec<String>) {
         for (i, w) in words.iter().enumerate() {
             if *w == "scn" {
                 let nums: Vec<f32> = words[..i].iter().rev().map_while(|x| x.parse().ok()).collect();
-                out.push(nums.into_iter().rev().collect());
+                // A pattern (`/P0 scn`) has no colour of its own.
+                if !nums.is_empty() {
+                    out.push(nums.into_iter().rev().collect());
+                }
             }
         }
     }
+    vectorcraft_pdf::import(&bytes).unwrap().walk(|n| {
+        if let NodeKind::Mesh(m) = &n.kind {
+            out.extend(m.points.iter().map(|p| match p.color {
+                Color::Cmyk { c, m, y, k } => vec![c, m, y, k],
+                c => c.to_rgb().to_vec(),
+            }));
+        }
+    });
     (out, serde_json::from_value(v["warnings"].clone()).unwrap())
 }
 

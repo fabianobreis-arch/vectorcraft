@@ -833,6 +833,42 @@ fn placed(visible: bool, matrix: &str, path: &str, preview: Option<&[u8]>, after
     s
 }
 
+/// [`placed`]'s file with its placed file written as the copy of an object on `%_` lines (the
+/// editable object whose drawn look comes before it): the lines from `%AI5_BeginPlace` to
+/// `%AI5_EndPlace` start with `%_`, the versioned content's markers aside. The preview's header
+/// line does too; its samples follow it raw.
+fn hide_placed(data: &[u8]) -> Vec<u8> {
+    let find = |w: &[u8]| data.windows(w.len()).position(|x| x == w).unwrap();
+    let (from, to) = (find(b"%AI5_BeginPlace"), find(b"%AI5_EndPlace\r") + 14);
+    let mut out = data[..from].to_vec();
+    for line in data[from..to].split(|b| *b == b'\r') {
+        if !line.is_empty() && !line.starts_with(b"%AI17_") {
+            out.extend_from_slice(b"%_");
+        }
+        out.extend_from_slice(line);
+        out.push(b'\r');
+    }
+    out.pop();
+    out.extend_from_slice(&data[to..]);
+    out
+}
+
+#[test]
+fn a_placed_file_on_commented_lines_is_read() {
+    // Its `%_%AI5_BeginPlace` was dropped as a comment after `%_`, so the `~` that ends it was an
+    // operator the reader didn't know, and the whole file came in as its PDF part; and its
+    // preview, whose header starts with `%_`, wasn't read.
+    let preview = [&b"2 1 12 32 17 "[..], &[255, 255, 0, 0, 128, 0, 64, 0, 9, 9, 9, 9]].concat();
+    let data = hide_placed(&placed(true, "[5 0 0 -5 0 200]", "/pics/photo.png", Some(&preview), ""));
+    assert!(data.windows(18).any(|w| w == b"%_%AI5_BeginPlace\r"), "{}", String::from_utf8_lossy(&data));
+    let r = read(&data).unwrap();
+    let a = art(&r.doc);
+    let NodeKind::Image(im) = &a[0].kind else { panic!("{:?}", a[0].kind) };
+    assert_eq!((im.link.as_ref().map(|l| l.path.as_str()), im.width, im.height), (Some("/pics/photo.png"), 2, 1));
+    let (img, _) = pixels(&r.doc);
+    assert_eq!((img.get_pixel(0, 0).0, img.get_pixel(1, 0).0), ([255, 0, 0, 255], [0, 127, 0, 128]), "its preview");
+}
+
 #[test]
 fn placed_files_are_linked_images_showing_their_preview() {
     // A 2×1 preview (premultiplied ARGB, a padded row) of a file of 4×2 pixels.

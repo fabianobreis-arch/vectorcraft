@@ -200,6 +200,13 @@ fn from_editing_data_alone(bytes: &[u8], opts: &LoadOptions) -> Option<Result<(D
     )
 }
 
+/// Does `doc` hold no art: only layers, with nothing in them?
+fn draws_nothing(doc: &Document) -> bool {
+    let mut art = false;
+    doc.walk(|n| art |= !n.is_layer());
+    !art
+}
+
 /// Is `e` the error of a file whose pages are only a placeholder
 /// ([`vectorcraft_pdf::PdfError::PlaceholderOnly`])?
 pub(crate) fn is_placeholder(e: &EngineError) -> bool {
@@ -275,8 +282,13 @@ pub fn load_with(name: &str, bytes: &[u8], opts: &LoadOptions) -> Result<Loaded>
             restore_or_import(editing, || match super::pdfimport::import(bytes, opts, format.id != "pdf") {
                 Ok(r) => {
                     // Pages of text alone: the editing copy alone where it reads, as for a file
-                    // saved without its PDF part (#1387: else the page, which is the art).
-                    let alone = r.only_text.then(|| from_editing_data_alone(bytes, opts)).flatten().and_then(|read| read.ok());
+                    // saved without its PDF part (#1387: else the page, which is the art). So too
+                    // pages that draw nothing at all: there is no page art to check the layers
+                    // against, and the empty page would lose all of it.
+                    let alone = (r.only_text || draws_nothing(&r.document))
+                        .then(|| from_editing_data_alone(bytes, opts))
+                        .flatten()
+                        .and_then(|read| read.ok());
                     let (doc, warnings, read) = match alone {
                         Some((doc, warnings)) => (doc, warnings, true),
                         None => through_editing_data(bytes, opts, r.document, r.warnings, r.user_unit),

@@ -2672,6 +2672,7 @@ mark-style	Japanese	Giapponese
 	Repeat Tab	Ripeti tabulazione
 	Repeat {name}	Ripeti {name}
 	Replace	Sostituisci
+	Replace:	Sostituisci:
 	Replace Font	Sostituisci font
 	Replace it with another file, or ignore it: its images keep showing the preview saved with the document.	Sostituiscilo con un altro file oppure ignoralo: le sue immagini continueranno a mostrare l'anteprima salvata con il documento.
 	Replace Spine	Sostituisci dorsale

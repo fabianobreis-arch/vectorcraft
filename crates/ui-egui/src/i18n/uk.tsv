@@ -2664,6 +2664,7 @@ mark-style	Japanese	Японський
 	Repeat Tab	Повторити табуляцію
 	Repeat {name}	Повторити {name}
 	Replace	Замінити
+	Replace:	Замінити:
 	Replace Font	Замінити шрифт
 	Replace it with another file, or ignore it: its images keep showing the preview saved with the document.	Замініть його іншим файлом або ігноруйте: зображення продовжать показувати попередній перегляд, збережений з документом.
 	Replace Spine	Замінити вісь

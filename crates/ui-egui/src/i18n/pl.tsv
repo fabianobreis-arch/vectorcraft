@@ -3683,6 +3683,7 @@ axis	Both	Obie
 	Set Text	Ustaw tekst
 	Insert Character	Wstaw znak
 	Replace	Zastąp
+	Replace:	Zastąp:
 	Type on a Path Options	Opcje tekstu na ścieżce
 	Highlight Variable	Wyróżnij zmienną
 	New Variable	Nowa zmienna

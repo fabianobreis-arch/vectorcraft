@@ -1,6 +1,6 @@
 # UI and interaction parity
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-30 · **Change:** minor (Average & Join with a corner or smooth choice, Cmd+Alt+Shift+J; one row done; scores and estimates unchanged) · **Target:** Adobe Illustrator 2026 (30.x)
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-30 · **Change:** minor (Spinners: a held arrow repeats after a pause (#4267); scores unchanged) · **Target:** Adobe Illustrator 2026 (30.x)
 
 ## Feature submission evidence
 
@@ -361,6 +361,9 @@ separate. Scores and hours unchanged. [Behavior and command details](development
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-30 | minor | Spinners: a held arrow repeats after a pause (#4267); scores and estimates unchanged |
+| 2026-10-30 | minor | Control bar: a Replace menu swaps the selected symbol instances' symbol (#4121); scores and estimates unchanged |
+| 2026-10-30 | minor | Color Mixer popover: the Color panel's menu with its color modes (#4249); scores and estimates unchanged |
 | 2026-10-30 | minor | Object › Path › Average & Join… (`path.averageJoin`, Cmd+Alt+Shift+J) moves two open path ends to their midpoint and joins them there, the joined anchor a corner or a smooth point as its dialog's Points choice asks, in one undo step; one row done; scores and estimates unchanged. |
 | 2026-10-30 | minor | G12: Preferences audit (#394): 5 options are stored but not acted on (Open Documents As Tabs, Units › East Asian Type, Hyphenation › Default Language, Scratch Disks, Legacy vector clipboard), each waiting on a subsystem; Highlight Alternate Glyphs, Real-time Drawing and the Devices options act; scores and estimates unchanged |
 | 2026-10-30 | minor | Preferences: the workspace, panels, toolbars and other UI settings are saved within 2 seconds of a change instead of only on quitting, and a window saves only what it changed, merged into the file as another VectorCraft window left it, so a second window closing last no longer puts back the settings it started with (#4625). Tests `prefs::tests` in `apps/vectorcraft`; scores and estimates unchanged |

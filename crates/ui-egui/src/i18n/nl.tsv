@@ -3592,6 +3592,7 @@ axis	Both	Beide
 	Set Text	Tekst instellen
 	Insert Character	Teken invoegen
 	Replace	Vervangen
+	Replace:	Vervangen:
 	Type on a Path Options	Opties voor tekst op pad
 	Highlight Variable	Variabele markeren
 	New Variable	Nieuwe variabele

@@ -3841,6 +3841,7 @@ axis	Both	Obě
 	Set Text	Nastavit text
 	Insert Character	Vložit znak
 	Replace	Nahradit
+	Replace:	Nahradit:
 	Type on a Path Options	Možnosti textu na cestě
 	Highlight Variable	Zvýraznit proměnnou
 	New Variable	Nová proměnná

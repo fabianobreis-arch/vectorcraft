@@ -15,6 +15,11 @@
 # Left in English on purpose (`MENU_KEEP_AS_IS` in the tests): the product name, language
 # names, OpenType, the built-in workspace names and the bracketed perspective grid preset names.
 	About VectorCraft	VectorCraft について
+	Check for Updates…	アップデートを確認…
+	Checking for updates…	アップデートを確認中…
+	Could not check for updates:\n{error}	アップデートを確認できませんでした:\n{error}
+	VectorCraft Updates	VectorCraft のアップデート
+	VectorCraft {version} is currently the newest version available.	VectorCraft {version} は最新バージョンです。
 	All Scripts	すべての文字
 	Anchors:	アンカー:
 	Any Kind	すべての種類
@@ -586,6 +591,8 @@ font-technology	Variable	バリアブル
 	Snap to Pixel	ピクセルにスナップ
 	Precise Cursors	精密カーソル
 	Image Trace Preview	画像トレースのプレビュー
+	Preparing the image…	画像を準備中…
+	Tracing the colors…	色をトレース中…
 	Snap to Point	ポイントにスナップ
 	Snap to Glyph	グリフにスナップ
 	New View…	新規表示…
@@ -2645,6 +2652,7 @@ mark-style	Japanese	日本式
 	Repeat Tab	タブを繰り返し
 	Repeat {name}	{name}を繰り返す
 	Replace	置換
+	Replace:	置換:
 	Replace Font	フォントを置換
 	Replace Symbol	シンボルを置き換え
 	Replace With Font	置換するフォント
