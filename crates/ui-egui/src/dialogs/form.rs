@@ -58,8 +58,8 @@ pub(super) fn length_within(
     range: Option<std::ops::RangeInclusive<f64>>,
 ) -> bool {
     let value = d.fields.contains_key(key).then(|| d.f64(key, 0.0));
-    let Some(v) = crate::widgets::num_field(ui, ("dlg-len", key), value, unit, width) else { return false };
-    let v = range.map_or(v, |r| v.max(*r.start()).min(*r.end()));
+    let bounds = range.unwrap_or(crate::widgets::ANY);
+    let Some(v) = crate::widgets::num_field_within(ui, ("dlg-len", key), value, unit, width, bounds) else { return false };
     d.fields.insert(key.into(), json!(v));
     true
 }
@@ -647,6 +647,17 @@ pub(crate) fn humanize(k: &str) -> String {
         "Sy" => "Vertical %".into(),
         "Radius1" => "Radius 1".into(),
         "Radius2" => "Radius 2".into(),
+        "Dash1" => "Dash 1:".into(),
+        "Dash2" => "Dash 2:".into(),
+        "Dash3" => "Dash 3:".into(),
+        "Dash4" => "Dash 4:".into(),
+        "Dash5" => "Dash 5:".into(),
+        "Gap1" => "Gap 1:".into(),
+        "Gap2" => "Gap 2:".into(),
+        "Gap3" => "Gap 3:".into(),
+        "Gap4" => "Gap 4:".into(),
+        "Gap5" => "Gap 5:".into(),
+        "Align Corners" => "Align to Corners and Ends:".into(),
         "Max Radius" => "Max. Radius:".into(),
         "Blur Mode" => "Mode:".into(),
         "Channel1" => "Channel 1:".into(),
